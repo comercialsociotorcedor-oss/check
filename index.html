@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checklist de Campo - Relatório Fotográfico (PGRSS)</title>
+  
+  <style>
+:root{
+  --bg: #0b1220;
+  --card: #0f172a;
+  --muted: #94a3b8;
+  --text: #e2e8f0;
+  --brand: #38bdf8;
+  --brand-2:#34d399;
+  --warn:#f59e0b;
+  --danger:#ef4444;
+  --radius: 14px;
+  --shadow: 0 10px 30px rgba(2,6,23,.35);
+  --ring: 0 0 0 3px rgba(56,189,248,.35);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0; font:16px/1.5 system-ui,Segoe UI,Roboto,Arial,sans-serif; color:var(--text); background: radial-gradient(1200px 800px at 20% -10%, #0b1b35, transparent), var(--bg)}
+.app-header{position:sticky; top:0; z-index:3; backdrop-filter: blur(8px); background: linear-gradient(180deg, rgba(2,6,23,.75), rgba(2,6,23,.35) 60%, transparent); padding:16px 16px 10px; border-bottom:1px solid rgba(148,163,184,.2)}
+.app-header__title h1{margin:0 0 6px; font-size:clamp(18px,2.5vw,22px)}
+.app-header__title p{margin:0; color:var(--muted); font-size:14px}
+.header-actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+.btn{appearance:none; border:none; border-radius:999px; padding:10px 14px; cursor:pointer; color:#081018; background:#e2e8f0; font-weight:600; transition:transform .12s ease}
+.btn:focus-visible{outline:none; box-shadow:var(--ring)}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:linear-gradient(135deg, #38bdf8, #22d3ee)}
+.btn-secondary{background:#94a3b8}
+.btn-success{background:linear-gradient(135deg, #34d399, #22c55e)}
+.btn-neutral{background:#e5e7eb}
+.btn-danger{background:linear-gradient(135deg, #f87171, #ef4444); color:#0b1220}
+.btn-ghost{background:transparent; color:var(--text); border:1px dashed rgba(226,232,240,.25)}
+.info-box,.lgpd-box{max-width:1100px; margin:14px auto; padding:14px; border-radius:var(--radius); background:linear-gradient(180deg, rgba(14,22,40,.8), rgba(14,22,40,.6)); border:1px solid rgba(148,163,184,.2)}
+.info-box ol{margin:8px 0 0 18px}
+.lgpd-box{color:#fef3c7; border-color:#f59e0b}
+.progress{max-width:1100px; margin:12px auto}
+.progress__bar{height:22px; background:#0b1220; border-radius:999px; overflow:hidden; border:1px solid rgba(148,163,184,.25)}
+.progress__fill{height:100%; background:linear-gradient(90deg, #34d399, #38bdf8); display:flex; align-items:center; justify-content:center; font-weight:700}
+.stats{display:flex; gap:12px; margin-top:10px; flex-wrap:wrap}
+.stat{flex:1 1 140px; background:linear-gradient(180deg, rgba(14,22,40,.8), rgba(14,22,40,.6)); border:1px solid rgba(148,163,184,.2); border-radius:var(--radius); padding:10px; text-align:center}
+.stat__number{font-size:24px; font-weight:800}
+.stat__label{color:var(--muted); font-size:12px}
+.content{max-width:1100px; margin:14px auto; display:grid; gap:12px}
+.section{border:1px solid rgba(148,163,184,.25); border-radius:var(--radius); background:linear-gradient(180deg, rgba(14,22,40,.65), rgba(14,22,40,.5)); box-shadow:var(--shadow)}
+.section__header{width:100%; background:linear-gradient(135deg, rgba(56,189,248,.2), rgba(34,197,94,.2)); padding:14px 16px; border:none; color:var(--text); border-radius:inherit; display:flex; align-items:center; justify-content:space-between; cursor:pointer}
+.section__header:focus-visible{outline:none; box-shadow:var(--ring)}
+.section__content{padding:14px; animation:fadeIn .2s ease both}
+.badge{background:rgba(56,189,248,.2); border:1px solid rgba(56,189,248,.45); color:#a5f3fc; padding:2px 8px; border-radius:999px; font-size:11px}
+.chevron{transition:transform .18s ease}
+.subsection{border-left:3px solid rgba(56,189,248,.45); padding-left:12px; margin:8px 0 18px}
+.subsection__desc{color:var(--muted); font-size:14px}
+.photo-item{display:flex; gap:12px; background:rgba(2,6,23,.4); border:1px solid rgba(148,163,184,.2); border-radius:12px; padding:12px; margin:10px 0; transition:border-color .15s ease, background .2s}
+.photo-item--checked{background:rgba(22,163,74,.15); border-color:rgba(34,197,94,.6)}
+.photo-check__box{width:22px; height:22px; accent-color:#34d399}
+.photo-details{flex:1}
+.photo-title{display:flex; align-items:center; gap:8px; font-weight:700}
+.photo-number{background:#38bdf8; color:#001018; padding:2px 10px; border-radius:999px; font-size:12px}
+.photo-description{color:var(--muted); font-size:14px; margin:6px 0 10px}
+.photo-actions{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px}
+.thumbs{list-style:none; padding:0; margin:0; display:grid; grid-template-columns:repeat(auto-fill, minmax(120px,1fr)); gap:10px}
+.thumb{position:relative; padding:8px; border:1px solid rgba(148,163,184,.25); border-radius:10px; background:#0b1220; transition:transform .12s ease, border-color .12s ease; user-select:none}
+.thumb[draggable="true"]{cursor:grab}
+.thumb:focus-visible{outline:none; box-shadow:var(--ring)}
+.thumb:hover{transform:translateY(-1px)}
+.thumb__img{display:block; width:100%; height:90px; object-fit:cover; border-radius:8px; background:#0a0f1a}
+.thumb__caption{margin-top:6px}
+.thumb__caption input{width:100%; background:transparent; border:1px dashed rgba(148,163,184,.35); color:var(--text); border-radius:8px; padding:6px 8px; font-size:13px}
+.thumb__buttons{display:flex; gap:6px; margin-top:6px}
+.icon-btn{border:none; border-radius:8px; padding:6px 8px; cursor:pointer; background:#111827; color:#e5e7eb}
+.icon-btn:hover{background:#0f172a}
+.icon-btn--danger{background:#7f1d1d}
+.app-footer{max-width:1100px; margin:24px auto 40px; text-align:center; color:var(--muted)}
+.toast{position:fixed; left:50%; bottom:18px; transform:translateX(-50%); background:#0b1220; color:var(--text); border:1px solid rgba(148,163,184,.25); padding:10px 14px; border-radius:999px; box-shadow:var(--shadow); opacity:0; animation:toastIn .2s ease forwards}
+@keyframes toastIn{to{opacity:1; transform:translateX(-50%) translateY(-2px)}}
+@keyframes fadeIn{from{opacity:0; transform:translateY(-2px)} to{opacity:1; transform:none}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important; transition:none!important}}
+@media print{body{background:white; color:#111827} .app-header, .info-box, .lgpd-box, .header-actions, .toast{display:none!important} .content{max-width:100%; margin:0} .section{break-inside:avoid; box-shadow:none; border-color:#cbd5e1} .thumb__img{height:80px} .thumb__caption input{border:none}}
+
+</style>
+  <meta name="theme-color" content="#0f172a">
+</head>
+<body>
+  <header class="app-header">
+    <div class="app-header__title">
+      <h1>📸 CHECKLIST DE CAMPO - RELATÓRIO FOTOGRÁFICO</h1>
+      <p>Clínica Dr. Cláudio Eulálio - Cirurgia Plástica — Sala 1701 - Diamond Center - Teresina/PI</p>
+    </div>
+    <div class="header-actions">
+      <button id="btnExpandAll" class="btn btn-primary">📂 Expandir tudo</button>
+      <button id="btnCollapseAll" class="btn btn-secondary">📁 Fechar tudo</button>
+      <button id="btnPrint" class="btn btn-success">🖨️ Imprimir</button>
+      <button id="btnExport" class="btn btn-neutral">⬇️ Exportar JSON</button>
+      <label class="btn btn-neutral">
+        ⬆️ Importar JSON
+        <input id="importInput" type="file" accept="application/json" hidden>
+      </label>
+      <button id="btnClear" class="btn btn-danger">🧹 Limpar dados</button>
+    </div>
+  </header>
+
+  <section class="info-box" role="note" aria-label="Instruções de Uso">
+    <h3>📋 Instruções de Uso</h3>
+    <ol>
+      <li>Abra no celular/tablet durante a visita.</li>
+      <li>Marque cada item após fotografar.</li>
+      <li>Use as notas por seção para observações.</li>
+      <li>Acompanhe o progresso abaixo.</li>
+      <li>⭐ = Item crítico (não pode faltar).</li>
+    </ol>
+  </section>
+
+  <section class="lgpd-box" role="note" aria-label="Aviso LGPD">
+    ⚠️ <strong>LGPD:</strong> Não captar rostos de pacientes nem dados identificáveis. Evite documentos pessoais e dados sensíveis em fotos.
+  </section>
+
+  <section class="progress">
+    <div class="progress__bar" aria-label="Progresso do checklist" aria-live="polite">
+      <div id="progressFill" class="progress__fill" style="width:0%">0%</div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="stat__number" id="statPhotos">0</div><div class="stat__label">Fotos confirmadas</div></div>
+      <div class="stat"><div class="stat__number" id="statItems">—</div><div class="stat__label">Total de itens</div></div>
+      <div class="stat"><div class="stat__number" id="statCritical">0/0</div><div class="stat__label">Críticos ⭐</div></div>
+    </div>
+  </section>
+
+  <main id="content" class="content">
+    <section class="section" data-section-id="sec-1">
+<button class="section__header" type="button" aria-expanded="false" aria-controls="sec-1-content">
+  <h2>🏢 1. FACHADA E ACESSO EXTERNO 3 fotos</h2>
+  <span class="chevron" aria-hidden="true">▼</span>
+</button>
+<div id="sec-1-content" class="section__content" hidden>
+
+<div class="subsection">
+<h3>1.1. Fachada do Edifício Diamond Center</h3>
+<div class="subsection-description">
+                        📍 <strong>Local:</strong> Av. Universitária, 750 - tire da calçada em frente<br/>
+                        🎯 <strong>Objetivo:</strong> Localizar geograficamente o estabelecimento
+                    </div>
+<div class="photo-item">
+<input onchange="updateProgress(this)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 01</span>
+                                Vista externa do prédio Diamond Center
+                            </div>
+<div class="photo-description">
+                                ✓ Fachada completa do edifício<br/>
+                                ✓ Letreiro "Diamond Center" visível<br/>
+                                ✓ Contexto urbano da localização
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Tire da calçada oposta (10-15 metros). Modo horizontal (paisagem)
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<div class="photo-item">
+<input onchange="updateProgress(this)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 02</span>
+                                Entrada da clínica - Sala 1701
+                            </div>
+<div class="photo-description">
+                                ✓ Porta com número "1701" bem visível<br/>
+                                ✓ Acesso ao 17º andar
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: 2-3 metros de distância. Certifique-se que o número aparece claramente
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<div class="photo-item">
+<input onchange="updateProgress(this)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 03</span>
+                                Placa de identificação do médico
+                            </div>
+<div class="photo-description">
+                                ✓ Placa "Dr. Cláudio Eulálio - Cirurgia Plástica"<br/>
+                                ✓ Identificação completa e legível
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Close (0,5-1 metro). Evite reflexos no vidro/acrílico
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<textarea class="notes-area" placeholder="📝 Notas e observações desta seção..."></textarea>
+</div>
+
+</div>
+</section><section class="section" data-section-id="sec-2">
+<button class="section__header" type="button" aria-expanded="false" aria-controls="sec-2-content">
+  <h2>🛋️ 2. RECEPÇÃO E SALA DE ESPERA 2 fotos</h2>
+  <span class="chevron" aria-hidden="true">▼</span>
+</button>
+<div id="sec-2-content" class="section__content" hidden>
+
+<div class="subsection">
+<h3>2.1. Área de Recepção</h3>
+<div class="subsection-description">
+                        📍 <strong>Local:</strong> Primeiro ambiente após entrada<br/>
+                        🎯 <strong>Objetivo:</strong> Documentar área administrativa e organização
+                    </div>
+<div class="photo-item">
+<input onchange="updateProgress(this)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 04</span>
+                                Balcão de recepção (visão geral)
+                            </div>
+<div class="photo-description">
+                                ✓ Balcão completo<br/>
+                                ✓ Computador e área de trabalho<br/>
+                                ✓ Organização geral
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Posicione-se de frente para o balcão. Foto ampla pegando todo o ambiente
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<div class="photo-item">
+<input onchange="updateProgress(this)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 05</span>
+                                Sala de espera
+                            </div>
+<div class="photo-description">
+                                ✓ Poltronas/cadeiras para pacientes<br/>
+                                ✓ TV ou elementos de conforto (se houver)<br/>
+                                ✓ Ambiente organizado e limpo
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: NÃO fotografe pacientes! Se houver alguém esperando, agende horário com menos movimento
+                            </div>
+<div class="alert-danger">
+                                ⚠️ <strong>ATENÇÃO:</strong> Não fotografar pacientes ou pessoas identificáveis (privacidade/LGPD)
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<textarea class="notes-area" placeholder="📝 Notas e observações desta seção..."></textarea>
+</div>
+
+</div>
+</section><section class="section" data-section-id="sec-3">
+<button class="section__header" type="button" aria-expanded="false" aria-controls="sec-3-content">
+  <h2>🩺 3. CONSULTÓRIO MÉDICO 1 foto</h2>
+  <span class="chevron" aria-hidden="true">▼</span>
+</button>
+<div id="sec-3-content" class="section__content" hidden>
+
+<div class="subsection">
+<h3>3.1. Sala de Consulta</h3>
+<div class="subsection-description">
+                        📍 <strong>Local:</strong> Ambiente para consultas e avaliações<br/>
+                        🎯 <strong>Objetivo:</strong> Documentar área de atendimento clínico
+                    </div>
+<div class="photo-item">
+<input onchange="updateProgress(this)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 06</span>
+                                Consultório (visão geral)
+                            </div>
+<div class="photo-description">
+                                ✓ Mesa do médico e cadeiras<br/>
+                                ✓ Maca de exame (se houver)<br/>
+                                ✓ Organização geral do ambiente
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Tire de um canto da sala (pega mais área). Evite documentos com dados de pacientes visíveis
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<textarea class="notes-area" placeholder="📝 Notas e observações desta seção..."></textarea>
+</div>
+
+</div>
+</section><section class="section" data-section-id="sec-4">
+<button class="section__header" type="button" aria-expanded="false" aria-controls="sec-4-content">
+  <h2>⚕️ 4. SALA DE PROCEDIMENTOS 4 fotos</h2>
+  <span class="chevron" aria-hidden="true">▼</span>
+</button>
+<div id="sec-4-content" class="section__content" hidden>
+
+<div class="critical-note">
+<strong>⭐ ÁREA IMPORTANTE!</strong> Esta sala é onde acontecem os procedimentos cirúrgicos ambulatoriais. Fotografe com atenção aos detalhes técnicos.
+                </div>
+<div class="subsection">
+<h3>4.1. Infraestrutura da Sala</h3>
+<div class="subsection-description">
+                        📍 <strong>Procedimentos realizados:</strong> Botox, preenchimentos, lipoaspiração ambulatorial, pequenas suturas, retirada de pontos<br/>
+                        🎯 <strong>Objetivo:</strong> Documentar capacidade técnica e infraestrutura
+                    </div>
+<div class="photo-item">
+<input onchange="updateProgress(this)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 07</span>
+                                Sala de procedimentos (visão geral)
+                            </div>
+<div class="photo-description">
+                                ✓ Vista ampla mostrando TODA a sala<br/>
+                                ✓ Maca elétrica posicionada<br/>
+                                ✓ Foco cirúrgico<br/>
+                                ✓ Armários e bancada<br/>
+                                ✓ <strong>Coletores de resíduos visíveis</strong>
+</div>
+<div class="photo-tips">
+                                💡 Dica: Tire de uma quina da sala (diagonal). Acenda todas as luzes. Inclua os coletores de lixo no enquadramento!
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<div class="photo-item">
+<input onchange="updateProgress(this)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 08</span>
+                                Maca elétrica e foco cirúrgico
+                            </div>
+<div class="photo-description">
+                                ✓ Maca ajustável completa<br/>
+                                ✓ Foco de luz posicionado<br/>
+                                ✓ Estado de conservação dos equipamentos
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Mostre que equipamentos estão em bom estado e funcionais
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<div class="photo-item">
+<input onchange="updateProgress(this)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 09</span>
+                                Armários de materiais
+                            </div>
+<div class="photo-description">
+                                ✓ Armários para materiais estéreis<br/>
+                                ✓ Organização externa (limpeza)<br/>
+                                ✓ Fechados ou abertos (se autorizarem)
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Pergunte se pode fotografar interior. Se não, fotografe apenas fechado mostrando organização
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<div class="photo-item">
+<input onchange="updateProgress(this)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 10</span>
+                                Bancada com pia
+                            </div>
+<div class="photo-description">
+                                ✓ Pia para higienização de mãos<br/>
+                                ✓ Torneira (verificar se tem acionamento por pedal - é um plus!)<br/>
+                                ✓ Sabão líquido/antisséptico<br/>
+                                ✓ Papel toalha<br/>
+                                ✓ Bancada limpa
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Se torneira for com pedal, tire foto close! É um diferencial positivo
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<textarea class="notes-area" placeholder="📝 Notas: estado dos equipamentos, organização, limpeza..."></textarea>
+</div>
+
+</div>
+</section><section class="section" data-section-id="sec-5">
+<button class="section__header" type="button" aria-expanded="false" aria-controls="sec-5-content">
+  <h2>♻️ 5. SISTEMA DE RESÍDUOS - SALA DE PROCEDIMENTOS ⭐⭐⭐ 5 fotos</h2>
+  <span class="chevron" aria-hidden="true">▼</span>
+</button>
+<div id="sec-5-content" class="section__content" hidden>
+
+<div class="alert-danger">
+<strong>🚨 SEÇÃO CRÍTICA - PRIORIDADE MÁXIMA!</strong><br/>
+                    Esta é a parte MAIS IMPORTANTE do relatório fotográfico. Fotografe com máxima atenção aos detalhes. Tire múltiplas fotos de cada coletor (depois escolhe a melhor).
+                </div>
+<div class="subsection">
+<h3>5.1. Coletor de RESÍDUO INFECTANTE (Grupo A) ☣️</h3>
+<div class="subsection-description">
+<strong>O que vai neste coletor:</strong> Gazes com sangue, luvas usadas em procedimentos, compressas sujas, tecido adiposo de lipoaspiração<br/>
+<strong>Base legal:</strong> RDC 222/2018, Art. 13-15
+                    </div>
+<div class="photo-item">
+<input onchange="updateProgress(this, true)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 11</span>
+                                ⭐ Coletor Grupo A - Vista Geral
+                            </div>
+<div class="photo-description">
+<strong>VERIFICAR e FOTOGRAFAR:</strong><br/>
+                                ✓ Saco cor BRANCA LEITOSA (ou vermelha)<br/>
+                                ✓ Símbolo de risco biológico ☣️ VISÍVEL<br/>
+                                ✓ Lixeira com tampa (de preferência com pedal)<br/>
+                                ✓ Nível de preenchimento (máximo 2/3 da capacidade)<br/>
+                                ✓ Lixeira completa (base até tampa)
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Distância 1-2 metros. Foto deve mostrar lixeira inteira. Acenda luz se necessário
+                            </div>
+<div class="critical-note">
+<strong>⚠️ ANÁLISE CRÍTICA:</strong><br/>
+                                • Símbolo é IMPRESSO no saco? (correto) ou é adesivo? (incorreto)<br/>
+                                • Saco está muito cheio? (acima de 2/3 = não conforme)<br/>
+                                • Tem pedal de acionamento? (positivo para relatório)
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<div class="photo-item">
+<input onchange="updateProgress(this, true)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 12</span>
+                                ⭐ Grupo A - Close no Símbolo
+                            </div>
+<div class="photo-description">
+<strong>FOTO CLOSE (30-50 cm):</strong><br/>
+                                ✓ Símbolo de risco biológico ☣️ bem nítido<br/>
+                                ✓ Verificar se é IMPRESSO (correto) ou adesivo (incorreto)<br/>
+                                ✓ Inscrição "INFECTANTE" ou "RESÍDUO INFECTANTE" (se tiver)
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Chegue bem perto! Foto deve ficar legível. Este detalhe é FUNDAMENTAL para análise
+                            </div>
+<div class="alert-danger">
+<strong>ATENÇÃO:</strong> Se o símbolo for ADESIVO (colado depois), isso é NÃO CONFORMIDADE! Anote para mencionar no relatório.
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+</div>
+<div class="subsection">
+<h3>5.2. Coletor de RESÍDUO COMUM (Grupo D) 🗑️</h3>
+<div class="subsection-description">
+<strong>O que vai neste coletor:</strong> Papel de embalagens limpas, plásticos sem contato com paciente, papel toalha do banheiro<br/>
+<strong>Regra de ouro:</strong> SEM contato com sangue ou fluidos = Grupo D
+                    </div>
+<div class="photo-item">
+<input onchange="updateProgress(this, true)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 13</span>
+                                ⭐ Coletor Grupo D - Resíduo Comum
+                            </div>
+<div class="photo-description">
+<strong>VERIFICAR e FOTOGRAFAR:</strong><br/>
+                                ✓ Saco cor PRETA, CINZA ou colorido (coleta seletiva)<br/>
+                                ✓ SEM símbolo de risco biológico<br/>
+                                ✓ Lixeira SEPARADA do infectante (não pode estar junto!)<br/>
+                                ✓ Verificar que NÃO há mistura de resíduos
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Mostre que as duas lixeiras estão claramente separadas (uma do lado da outra, mas distintas)
+                            </div>
+<div class="alert-danger">
+<strong>NÃO CONFORMIDADE GRAVE:</strong> Se houver resíduos infectantes (gazes sujas, luvas) no lixo comum = MISTURA PROIBIDA! Fotografe e anote!
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+</div>
+<div class="subsection">
+<h3>5.3. Coletor de PERFUROCORTANTES (Grupo E) 💉⭐⭐⭐</h3>
+<div class="subsection-description">
+<strong>O que vai neste coletor:</strong> Agulhas (hipodérmicas, sutura), lâminas de bisturi, scalps, ampolas de vidro quebradas<br/>
+<strong>Base legal:</strong> RDC 222/2018, Art. 86-89
+                    </div>
+<div class="alert-danger">
+<strong>🚨 ITEM SUPER CRÍTICO!</strong> O coletor de perfurocortantes é um dos pontos mais fiscalizados. Fotografe com máxima atenção!<br/>
+<strong>⚠️ NUNCA fotografe o coletor ABERTO! Risco de acidente!</strong>
+</div>
+<div class="photo-item">
+<input onchange="updateProgress(this, true)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 14</span>
+                                ⭐⭐⭐ Perfurocortante - Vista Geral FECHADO
+                            </div>
+<div class="photo-description">
+<strong>CARACTERÍSTICAS OBRIGATÓRIAS:</strong><br/>
+                                ✓ COR AMARELA (obrigatório pela norma!)<br/>
+                                ✓ Material RÍGIDO (papelão rígido ou plástico)<br/>
+                                ✓ TAMPA BEM FECHADA (verificar vedação!)<br/>
+                                ✓ Sem perfurações ou avarias<br/>
+                                ✓ Nível de preenchimento até 2/3 da capacidade<br/>
+                                ✓ Localizado próximo ao ponto de uso
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Distância 0,5-1 metro. Mostre coletor completo. Verifique visualmente se a tampa está bem vedada!
+                            </div>
+<div class="critical-note">
+<strong>PONTOS CRÍTICOS DE ANÁLISE:</strong><br/>
+                                • Tampa está realmente fechada? (se aberta = NÃO CONFORME GRAVE!)<br/>
+                                • Coletor muito cheio? (acima de 2/3 = trocar imediatamente)<br/>
+                                • Cor amarela bem visível? (obrigatório)<br/>
+                                • Há sinais de vazamento ou perfuração? (grave se houver)
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<div class="photo-item">
+<input onchange="updateProgress(this, true)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 15</span>
+                                ⭐⭐⭐ Perfurocortante - Close na Identificação
+                            </div>
+<div class="photo-description">
+<strong>ETIQUETA DEVE CONTER:</strong><br/>
+                                ✓ Símbolo de risco biológico ☣️<br/>
+                                ✓ Inscrição "PERFUROCORTANTE"<br/>
+                                ✓ Identificação do local: "SALA 1701"<br/>
+                                ✓ Capacidade do coletor (ex: 7 litros)<br/>
+                                ✓ Linha de preenchimento máximo (2/3)<br/>
+                                ✓ Data de início do uso (se tiver)<br/>
+                                ✓ Inscrição "NÃO ESVAZIAR" ou "NÃO REAPROVEITAR"
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: FOTO BEM DE PERTO (20-30 cm). Deve ficar 100% legível! Esta foto é essencial para análise de conformidade.
+                            </div>
+<div class="alert-danger">
+<strong>SE FALTAR ALGUMA INFORMAÇÃO NA ETIQUETA:</strong> É não conformidade! Anote tudo que está faltando para mencionar no relatório.
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+</div>
+<textarea class="notes-area" placeholder="📝 NOTAS CRÍTICAS: Símbolos impressos ou adesivos? Níveis de preenchimento? Segregação correta? Tampa do perfurocortante bem vedada? Observações importantes..."></textarea>
+
+</div>
+</section><section class="section" data-section-id="sec-6">
+<button class="section__header" type="button" aria-expanded="false" aria-controls="sec-6-content">
+  <h2>🧼 6. EXPURGO (SALA DE UTILIDADES) 3 fotos</h2>
+  <span class="chevron" aria-hidden="true">▼</span>
+</button>
+<div id="sec-6-content" class="section__content" hidden>
+
+<div class="critical-note">
+<strong>⭐ IMPORTANTE!</strong> Expurgo é área crítica para higienização. Deve estar limpo e organizado.
+                </div>
+<div class="subsection">
+<h3>6.1. Ambiente de Limpeza</h3>
+<div class="subsection-description">
+                        📍 <strong>Função:</strong> Limpeza de instrumentais, higienização de materiais, preparo de soluções<br/>
+                        🎯 <strong>Objetivo:</strong> Comprovar ambiente exclusivo para área "suja"
+                    </div>
+<div class="photo-item">
+<input onchange="updateProgress(this)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 16</span>
+                                Porta do expurgo
+                            </div>
+<div class="photo-description">
+                                ✓ Porta com identificação "EXPURGO" ou "SALA DE UTILIDADES"<br/>
+                                ✓ Placa visível
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Foto da porta externa. Identificação deve estar legível
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<div class="photo-item">
+<input onchange="updateProgress(this)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 17</span>
+                                Expurgo (visão geral interna)
+                            </div>
+<div class="photo-description">
+                                ✓ Interior mostrando pia<br/>
+                                ✓ Prateleiras para produtos<br/>
+                                ✓ Produtos de limpeza organizados<br/>
+                                ✓ Ambiente limpo e organizado
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Vista ampla do interior. Ambiente deve estar arrumado na hora da foto
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<div class="photo-item">
+<input onchange="updateProgress(this, true)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 18</span>
+                                ⭐ Pia do expurgo (detalhe)
+                            </div>
+<div class="photo-description">
+                                ✓ Close na pia e torneira<br/>
+                                ✓ <strong>OBSERVAR: Tipo de torneira:</strong><br/>
+                                  → Com acionamento por pedal (ÓTIMO - mencione no relatório!)<br/>
+                                  → Alavanca única (BOM)<br/>
+                                  → Manual comum (ACEITÁVEL)<br/>
+                                ✓ Presença de sabão<br/>
+                                ✓ Estado de conservação
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Se torneira for com pedal, destaque isso no relatório! É um ponto muito positivo.
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<textarea class="notes-area" placeholder="📝 Notas: tipo de torneira, organização, produtos vencidos (se houver), limpeza..."></textarea>
+</div>
+
+</div>
+</section><section class="section" data-section-id="sec-7">
+<button class="section__header" type="button" aria-expanded="false" aria-controls="sec-7-content">
+  <h2>🚽 7. BANHEIROS 1-2 fotos</h2>
+  <span class="chevron" aria-hidden="true">▼</span>
+</button>
+<div id="sec-7-content" class="section__content" hidden>
+
+<div class="subsection">
+<h3>7.1. Instalações Sanitárias</h3>
+<div class="subsection-description">
+                        📍 <strong>Segundo PGRSS:</strong> Clínica tem 2 banheiros<br/>
+                        🎯 <strong>Objetivo:</strong> Documentar instalações sanitárias adequadas
+                    </div>
+<div class="photo-item">
+<input onchange="updateProgress(this)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 19</span>
+                                Banheiro (visão geral)
+                            </div>
+<div class="photo-description">
+                                ✓ Vaso sanitário<br/>
+                                ✓ Pia<br/>
+                                ✓ Revestimento cerâmico<br/>
+                                ✓ Limpeza e conservação
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Fotografe com banheiro limpo! Se tiver 2 banheiros diferentes, tire 1 foto de cada.
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<textarea class="notes-area" placeholder="📝 Notas: condições de limpeza, funcionamento, ventilação..."></textarea>
+</div>
+
+</div>
+</section><section class="section" data-section-id="sec-8">
+<button class="section__header" type="button" aria-expanded="false" aria-controls="sec-8-content">
+  <h2>📦 8. ARMAZENAMENTO TEMPORÁRIO - 17º ANDAR ⭐⭐ 3 fotos</h2>
+  <span class="chevron" aria-hidden="true">▼</span>
+</button>
+<div id="sec-8-content" class="section__content" hidden>
+
+<div class="alert-danger">
+<strong>🚨 ÁREA MUITO IMPORTANTE!</strong><br/>
+                    Segundo o PGRSS, os resíduos RSS (Grupo A/E) ficam armazenados no 17º andar até coleta MENSAL pela NATUS Ambiental.<br/>
+<strong>A BOMBONA AZUL DEVE ESTAR HERMETICAMENTE FECHADA!</strong>
+</div>
+<div class="subsection">
+<h3>8.1. Local de Armazenamento no Pavimento</h3>
+<div class="subsection-description">
+                        📍 <strong>Local:</strong> Área próxima à sala 1701 (mesmo andar)<br/>
+                        🎯 <strong>Objetivo:</strong> Documentar armazenamento provisório até coleta mensal
+                    </div>
+<div class="photo-item">
+<input onchange="updateProgress(this)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 20</span>
+                                Porta/área do armazenamento temporário
+                            </div>
+<div class="photo-description">
+                                ✓ Entrada do local<br/>
+                                ✓ Identificação (se houver)<br/>
+                                ✓ Localização no 17º andar
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Pode ser uma sala, um quartinho ou área específica no corredor do andar
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<div class="photo-item">
+<input onchange="updateProgress(this, true)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 21</span>
+                                ⭐⭐⭐ BOMBONA AZUL 50L - HERMETICAMENTE FECHADA
+                            </div>
+<div class="photo-description">
+<strong>ESTA É UMA DAS FOTOS MAIS CRÍTICAS!</strong><br/><br/>
+<strong>VERIFICAR E FOTOGRAFAR:</strong><br/>
+                                ✓ Cor AZUL bem visível (50 litros)<br/>
+                                ✓ <strong>TAMPA HERMETICAMENTE FECHADA</strong> (CRÍTICO!)<br/>
+                                ✓ Etiqueta: "LIXO INFECTANTE - SALA 1701"<br/>
+                                ✓ Símbolo de risco biológico ☣️<br/>
+                                ✓ Estado de conservação da bombona<br/>
+                                ✓ Sem vazamentos ou avarias
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Distância 0,5-1 metro. Foto deve mostrar CLARAMENTE que a tampa está bem vedada!
+                            </div>
+<div class="alert-danger">
+<strong>⚠️ NÃO CONFORMIDADE GRAVÍSSIMA:</strong><br/>
+                                Se a bombona estiver ABERTA ou MAL VEDADA = RISCO DE CONTAMINAÇÃO!<br/>
+                                Se encontrar assim, fotografe (é prova) e RECOMENDE FECHAMENTO IMEDIATO no relatório!<br/><br/>
+<strong>Pergunte ao responsável:</strong> "A bombona está bem fechada? Posso verificar a vedação?"
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<div class="photo-item">
+<input onchange="updateProgress(this)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 22</span>
+                                Lixeira de resíduo comum (se houver no local)
+                            </div>
+<div class="photo-description">
+                                ✓ Lixeira com saco preto (Grupo D)<br/>
+                                ✓ Separada do infectante<br/>
+                                ✓ Sem mistura
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Mostrar que há segregação também no armazenamento temporário
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<textarea class="notes-area" placeholder="📝 NOTAS CRÍTICAS: Bombona bem fechada? Estado de vedação? Etiqueta legível? Organização do local? Observações..."></textarea>
+</div>
+
+</div>
+</section><section class="section" data-section-id="sec-9">
+<button class="section__header" type="button" aria-expanded="false" aria-controls="sec-9-content">
+  <h2>🏢 9. ARMAZENAMENTO EXTERNO - TÉRREO ⭐⭐⭐ 7 fotos</h2>
+  <span class="chevron" aria-hidden="true">▼</span>
+</button>
+<div id="sec-9-content" class="section__content" hidden>
+
+<div class="alert-danger">
+<strong>🚨 SEÇÃO CRÍTICA - SUPER IMPORTANTE!</strong><br/>
+                    O abrigo externo é uma das áreas mais fiscalizadas. Tire muitas fotos e observe TODOS os detalhes!<br/><br/>
+<strong>Segundo PGRSS:</strong><br/>
+                    • Abrigo no térreo do Diamond Center<br/>
+                    • 2 áreas separadas: RSS e Resíduo Comum<br/>
+                    • Acesso externo pela Rua Miosótis
+                </div>
+<div class="subsection">
+<h3>9.1. Acesso Externo</h3>
+<div class="subsection-description">
+                        📍 <strong>Local:</strong> Rua Miosótis (lateral do edifício)<br/>
+                        🎯 <strong>Objetivo:</strong> Documentar acesso para coleta externa
+                    </div>
+<div class="photo-item">
+<input onchange="updateProgress(this)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 23</span>
+                                Portão de acesso - Rua Miosótis
+                            </div>
+<div class="photo-description">
+                                ✓ Vista externa da Rua Miosótis<br/>
+                                ✓ Portão onde caminhão coletor para<br/>
+                                ✓ Acesso facilitado para veículos
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Tire da calçada mostrando portão e acesso
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+</div>
+<div class="subsection">
+<h3>9.2. Entrada Interna do Abrigo</h3>
+<div class="photo-item">
+<input onchange="updateProgress(this, true)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 24</span>
+                                ⭐ Porta interna do abrigo
+                            </div>
+<div class="photo-description">
+                                ✓ Porta vista de dentro do edifício (térreo)<br/>
+                                ✓ Identificação: "LIXO" ou "RESÍDUOS" ou "ABRIGO DE RESÍDUOS"<br/>
+                                ✓ Símbolo de risco biológico (se houver)
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Foto da entrada mostrando identificação clara
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+</div>
+<div class="subsection">
+<h3>9.3. Interior do Abrigo - ÁREA CRÍTICA!</h3>
+<div class="photo-item">
+<input onchange="updateProgress(this, true)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 25</span>
+                                ⭐⭐⭐ Visão geral do abrigo (interno)
+                            </div>
+<div class="photo-description">
+<strong>FOTO AMPLA mostrando:</strong><br/>
+                                ✓ <strong>SEPARAÇÃO entre RSS e resíduo comum</strong> (CRÍTICO!)<br/>
+                                ✓ Piso impermeável (cerâmica/cimento queimado)<br/>
+                                ✓ Paredes revestidas<br/>
+                                ✓ Organização geral<br/>
+                                ✓ Limpeza do ambiente<br/>
+                                ✓ Recipientes fechados (bombonas/sacos)
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Tire de cima para baixo (pega mais área). Acenda TODAS as luzes! Foto não pode ficar escura!
+                            </div>
+<div class="critical-note">
+<strong>PONTOS CRÍTICOS DE ANÁLISE:</strong><br/>
+                                • Há separação CLARA entre RSS e comum? (obrigatório!)<br/>
+                                • Piso é lavável? Está limpo?<br/>
+                                • Há presença de vetores (mosquitos, baratas, ratos)? (se houver = grave!)<br/>
+                                • Recipientes estão fechados? (obrigatório!)
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<div class="photo-item">
+<input onchange="updateProgress(this, true)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 26</span>
+                                ⭐ Detalhes do piso e drenagem
+                            </div>
+<div class="photo-description">
+                                ✓ Piso impermeável (cerâmica/cimento queimado)<br/>
+                                ✓ Ralo sifonado (se visível)<br/>
+                                ✓ Canaletas de escoamento<br/>
+                                ✓ Declividade (se possível observar)
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Foto do chão mostrando tipo de piso e sistema de drenagem
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<div class="photo-item">
+<input onchange="updateProgress(this, true)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 27</span>
+                                ⭐⭐ Ventilação e tela de proteção
+                            </div>
+<div class="photo-description">
+<strong>MUITO IMPORTANTE:</strong><br/>
+                                ✓ Abertura para ventilação natural<br/>
+                                ✓ <strong>TELA de proteção contra insetos e roedores</strong> (OBRIGATÓRIO!)<br/>
+                                ✓ Verificar se tela está ÍNTEGRA (sem rasgos ou furos)
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Close na abertura mostrando tela claramente. Verifique visualmente se há rasgos!
+                            </div>
+<div class="alert-danger">
+<strong>NÃO CONFORMIDADE GRAVE:</strong><br/>
+                                • FALTA de tela = entrada de vetores = risco sanitário!<br/>
+                                • Tela rasgada/furada = mesma gravidade!<br/>
+                                Se encontrar, fotografe (prova) e RECOMENDE CORREÇÃO URGENTE!
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<div class="photo-item">
+<input onchange="updateProgress(this, true)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 28</span>
+                                ⭐ Porta específica para RSS
+                            </div>
+<div class="photo-description">
+                                ✓ Porta/área com símbolo de risco biológico ☣️<br/>
+                                ✓ Identificação "GRUPO A", "RSS" ou "INFECTANTE"<br/>
+                                ✓ Separação visual da área de resíduo comum
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Mostrar que há segregação no abrigo externo também
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<div class="photo-item">
+<input onchange="updateProgress(this)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 29</span>
+                                Ponto de água para higienização
+                            </div>
+<div class="photo-description">
+                                ✓ Torneira/mangueira para limpeza<br/>
+                                ✓ Área para lavagem dos coletores<br/>
+                                ✓ Ponto de água funcional
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Mostrar que é possível higienizar os recipientes no local
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<textarea class="notes-area" placeholder="📝 NOTAS CRÍTICAS DO ABRIGO: Separação RSS/comum clara? Tela íntegra? Presença de vetores? Limpeza? Piso impermeável? Recipientes fechados? Observações importantes..."></textarea>
+</div>
+
+</div>
+</section><section class="section" data-section-id="sec-10">
+<button class="section__header" type="button" aria-expanded="false" aria-controls="sec-10-content">
+  <h2>📄 10. DOCUMENTAÇÃO TÉCNICA 4 fotos</h2>
+  <span class="chevron" aria-hidden="true">▼</span>
+</button>
+<div id="sec-10-content" class="section__content" hidden>
+
+<div class="critical-note">
+<strong>⚠️ IMPORTANTE:</strong> Fotografe documentos completos e LEGÍVEIS. Verifique validades!
+                </div>
+<div class="subsection">
+<h3>10.1. Certificados Obrigatórios</h3>
+<div class="photo-item">
+<input onchange="updateProgress(this, true)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 30</span>
+                                ⭐ Certificado de Higienização do Reservatório
+                            </div>
+<div class="photo-description">
+<strong>VERIFICAR NO CERTIFICADO:</strong><br/>
+                                ✓ Empresa: SANITIZAR<br/>
+                                ✓ Data da higienização: Abril/2025<br/>
+                                ✓ <strong>Validade: 01/10/2025</strong><br/>
+                                ✓ Nome do estabelecimento correto<br/>
+                                ✓ Certificado completo e legível
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Tire de cima para baixo, sem sombras. Todas as informações devem ficar legíveis
+                            </div>
+<div class="critical-note">
+<strong>ANÁLISE:</strong> Certificado válido até 01/10/2025. Se a visita for após esta data = VENCIDO = não conforme!
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<div class="photo-item">
+<input onchange="updateProgress(this, true)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 31</span>
+                                ⭐ Certificado de Controle de Pragas (Dedetização)
+                            </div>
+<div class="photo-description">
+<strong>VERIFICAR NO CERTIFICADO:</strong><br/>
+                                ✓ Empresa: T C de S Costa Dedetizadora<br/>
+                                ✓ Data da dedetização: Abril/2025<br/>
+                                ✓ <strong>Validade: 08/10/2025</strong><br/>
+                                ✓ Certificado completo e legível
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Mesmo procedimento. Foto legível de todo o certificado
+                            </div>
+<div class="critical-note">
+<strong>ANÁLISE:</strong> Certificado válido até 08/10/2025. Verificar se está dentro da validade na data da visita!
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+</div>
+<div class="subsection">
+<h3>10.2. Contratos de Coleta</h3>
+<div class="photo-item">
+<input onchange="updateProgress(this)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 32</span>
+                                Contrato NATUS Ambiental (RSS)
+                            </div>
+<div class="photo-description">
+<strong>FOTOGRAFAR:</strong><br/>
+                                ✓ Primeira página/capa do contrato<br/>
+                                ✓ Nome: NATUS Ambiental LTDA<br/>
+                                ✓ Tipo de serviço: Coleta de RSS (Grupos A e E)<br/>
+                                ✓ Periodicidade: MENSAL
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Não precisa fotografar contrato inteiro, só primeira página identificando a empresa e serviço
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<div class="photo-item">
+<input onchange="updateProgress(this)" type="checkbox"/>
+<div class="photo-details">
+<div class="photo-title">
+<span class="photo-number">FOTO 33</span>
+                                Licença Ambiental da NATUS (se disponível)
+                            </div>
+<div class="photo-description">
+                                ✓ Cópia da licença ambiental da empresa coletora<br/>
+                                ✓ Verificar validade<br/>
+                                ✓ CNPJ da empresa
+                            </div>
+<div class="photo-tips">
+                                💡 Dica: Pergunte se têm cópia da licença da NATUS. Se não tiverem, anote no relatório "não disponibilizado"
+                            </div>
+<div class="photo-actions"><label class="btn btn-ghost">📷 Adicionar foto<input accept="image/*" capture="environment" class="file-input" hidden="True" multiple="True" type="file"/></label></div><ul aria-label="Galeria de fotos" class="thumbs"></ul></div>
+</div>
+<textarea class="notes-area" placeholder="📝 Notas: Certificados dentro da validade? Falta algum documento? Observações..."></textarea>
+</div>
+
+</div>
+</section>
+  </main>
+
+  <footer class="app-footer">
+    <p><strong>Checklist Interativo — Relatório Fotográfico RSS</strong></p>
+    <p>RDC ANVISA 222/2018 • CONAMA 358/2005 • IN SEMAM Teresina 001/2024</p>
+    <small>As marcações e fotos são salvas localmente no dispositivo.</small>
+  </footer>
+
+  <script type="module">
+// === db.js ===
+const DB_NAME='pgrss-photos'; const DB_VER=1; const STORE='photos'; let _db;
+function openDB(){return new Promise((res,rej)=>{ if(_db) return res(_db); const req=indexedDB.open(DB_NAME,DB_VER);
+  req.onupgradeneeded=(e)=>{const db=e.target.result; if(!db.objectStoreNames.contains(STORE)){db.createObjectStore(STORE);} };
+  req.onsuccess=(e)=>{_db=e.target.result; res(_db)}; req.onerror=()=>rej(req.error); });}
+async function putPhoto(id, blob){ const db=await openDB(); return new Promise((res,rej)=>{ const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).put(blob,id); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); });}
+async function getPhoto(id){ const db=await openDB(); return new Promise((res,rej)=>{ const tx=db.transaction(STORE,'readonly'); const req=tx.objectStore(STORE).get(id); req.onsuccess=()=>res(req.result||null); req.onerror=()=>rej(req.error); });}
+async function deletePhoto(id){ const db=await openDB(); return new Promise((res,rej)=>{ const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).delete(id); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); });}
+async function getAllKeys(){ const db=await openDB(); return new Promise((res,rej)=>{ const tx=db.transaction(STORE,'readonly'); const req=tx.objectStore(STORE).getAllKeys(); req.onsuccess=()=>res(req.result||[]); req.onerror=()=>rej(req.error); });}
+async function clearAll(){ const db=await openDB(); return new Promise((res,rej)=>{ const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).clear(); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); });}
+
+const DB = { putPhoto, getPhoto, deletePhoto, getAllKeys, clearAll };
+
+// === state.js ===
+const LS_CHECKS='pgrss-checks'; const LS_NOTES='pgrss-notes'; const LS_META='pgrss-photos-meta';
+const q=(s,r=document)=>r.querySelector(s); const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
+function clearAll(){ localStorage.removeItem(LS_CHECKS); localStorage.removeItem(LS_NOTES); localStorage.removeItem(LS_META); }
+function getChecks(){ try{return JSON.parse(localStorage.getItem(LS_CHECKS))||{}}catch{return {}} }
+function getNotes(){  try{return JSON.parse(localStorage.getItem(LS_NOTES)) ||[]}catch{return []} }
+function getMeta(){   try{return JSON.parse(localStorage.getItem(LS_META))  ||{}}catch{return {}} }
+function saveChecks(d){ localStorage.setItem(LS_CHECKS, JSON.stringify(d)); }
+function saveNotes(d){  localStorage.setItem(LS_NOTES , JSON.stringify(d)); }
+function saveMeta(d){   localStorage.setItem(LS_META  , JSON.stringify(d)); }
+async function restoreAll(DB){
+  const checks=getChecks();
+  qa('.photo-item').forEach((it)=>{
+    const id=it.dataset.itemId; const checked=checks[id]??false; const cb=it.querySelector('input[type=checkbox]');
+    if (cb){ cb.checked=!!checked; it.classList.toggle('photo-item--checked', !!checked); }
+  });
+  const notes=getNotes(); qa('.notes-area').forEach((ta,idx)=>{ if(typeof notes[idx]==='string') ta.value=notes[idx]; });
+}
+function persistChecksFromDOM(){
+  const obj={}; qa('.photo-item').forEach((it)=>{ const id=it.dataset.itemId; const cb=it.querySelector('input[type=checkbox]'); obj[id]=!!(cb&&cb.checked); });
+  saveChecks(obj);
+}
+function persistNotesFromDOM(){ const arr=qa('.notes-area').map(ta=>ta.value); saveNotes(arr); }
+function getItemMeta(itemId){ const all=getMeta(); return all[itemId] || { photoIds:[], captions:{}, order:[] }; }
+function setItemMeta(itemId, meta){ const all=getMeta(); all[itemId]=meta; saveMeta(all); }
+async function exportJSON(DB){
+  const meta=getMeta(), checks=getChecks(), notes=getNotes();
+  const keys=await DB.getAllKeys(); const hashes={};
+  for (const key of keys){ const blob=await DB.getPhoto(key); if(!blob) continue; const hash=await blobHash(blob); hashes[key]=hash; }
+  return { version:1, checks, notes, meta, hashes, exportedAt:new Date().toISOString() };
+}
+async function importJSON(data){
+  if(!data || data.version!==1) throw new Error('Arquivo de backup inválido.');
+  saveChecks(data.checks||{}); saveNotes(data.notes||[]); saveMeta(data.meta||{});
+}
+async function blobHash(blob){ const buf=await blob.arrayBuffer(); const dig=await crypto.subtle.digest('SHA-256', buf); return [...new Uint8Array(dig)].map(b=>b.toString(16).padStart(2,'0')).join(''); }
+
+const ST = { clearAll, getChecks, getNotes, getMeta, saveChecks, saveNotes, saveMeta, restoreAll, persistChecksFromDOM, persistNotesFromDOM, getItemMeta, setItemMeta, exportJSON, importJSON };
+
+// === photos.js ===
+import * as DB from './db.js'; import * as ST from './state.js';
+const qa=(s,r=document)=>Array.from(r.querySelectorAll(s)); const q=(s,r=document)=>r.querySelector(s);
+async function restoreAllGalleries(DBref, STref){ for (const item of qa('.photo-item')){ await renderGalleryForItem(item); } }
+async function renderGalleryForItem(itemEl){
+  const itemId=itemEl.dataset.itemId; const meta=ST.getItemMeta(itemId); const list=ensureThumbList(itemEl); list.innerHTML='';
+  for (const id of meta.order){ await appendThumb(list, itemId, id, meta); }
+}
+function installFileInputHandler(itemEl){
+  const input=ensureFileInput(itemEl);
+  input.addEventListener('change', async (e)=>{
+    const files=Array.from(e.target.files||[]); if(!files.length) return;
+    for (const f of files){
+      const {blob}=await compressImage(f);
+      const pid=`${itemEl.dataset.itemId}-${crypto.randomUUID()}`;
+      await DB.putPhoto(pid, blob);
+      const meta=ST.getItemMeta(itemEl.dataset.itemId);
+      if(!meta.photoIds.includes(pid)) meta.photoIds.push(pid);
+      meta.order.push(pid); meta.captions[pid]=''; ST.setItemMeta(itemEl.dataset.itemId, meta);
+    }
+    await renderGalleryForItem(itemEl); toast('Foto(s) adicionada(s).');
+  }, {once:false});
+}
+function ensureFileInput(itemEl){
+  let input=q('.file-input', itemEl);
+  if(!input){
+    const actions = q('.photo-actions', itemEl) || (()=>{ const d=document.createElement('div'); d.className='photo-actions'; itemEl.appendChild(d); return d; })();
+    const label=document.createElement('label'); label.className='btn btn-ghost'; label.textContent='📷 Adicionar foto';
+    input=document.createElement('input'); input.type='file'; input.accept='image/*'; input.setAttribute('capture','environment'); input.multiple=true; input.hidden=true; input.className='file-input';
+    label.appendChild(input); actions.appendChild(label);
+  }
+  return input;
+}
+function ensureThumbList(itemEl){
+  let ul=q('.thumbs', itemEl);
+  if(!ul){ ul=document.createElement('ul'); ul.className='thumbs'; ul.setAttribute('aria-label','Galeria de fotos'); itemEl.appendChild(ul); }
+  return ul;
+}
+async function compressImage(file){
+  const maxSide=1600, quality=0.7; const orientation=await readExifOrientation(file).catch(()=>1);
+  const bmp=await createImageBitmap(file); const {w,h}=fitSize(bmp.width,bmp.height,maxSide);
+  const canvas=new OffscreenCanvas(w,h); const ctx=canvas.getContext('2d',{alpha:false});
+  applyOrientation(ctx, orientation, w, h); ctx.drawImage(bmp,0,0,w,h);
+  const blob=await canvas.convertToBlob({type:'image/jpeg',quality}); return {blob,width:w,height:h};
+}
+function fitSize(w,h,max){ const s=Math.min(1, max/Math.max(w,h)); return {w:Math.round(w*s), h:Math.round(h*s)} }
+function applyOrientation(ctx,o,w,h){ switch(o){ case 2: ctx.translate(w,0); ctx.scale(-1,1); break; case 3: ctx.translate(w,h); ctx.rotate(Math.PI); break; case 4: ctx.translate(0,h); ctx.scale(1,-1); break; case 5: ctx.rotate(.5*Math.PI); ctx.scale(1,-1); ctx.translate(0,-w); break; case 6: ctx.rotate(.5*Math.PI); ctx.translate(0,-w); break; case 7: ctx.rotate(.5*Math.PI); ctx.translate(h,-w); ctx.scale(-1,1); break; case 8: ctx.rotate(-.5*Math.PI); ctx.translate(-h,0); break; default: break; } }
+async function readExifOrientation(file){
+  const buf=await file.arrayBuffer(); const view=new DataView(buf); if(view.getUint16(0,false)!==0xFFD8) return 1;
+  let off=2; const len=view.byteLength;
+  while(off<len){ const marker=view.getUint16(off,false); off+=2;
+    if(marker===0xFFE1){ const exifLen=view.getUint16(off,false); off+=2; const exif=new DataView(buf,off,exifLen);
+      // Simplified search for tag 0x0112
+      for (let i=8;i<exif.byteLength-2;i++){ if(exif.getUint16(i,false)===0x0112){ const val=exif.getUint16(i+8,false); return val||1; } } return 1;
+    } else if((marker & 0xFF00)!==0xFF00){ break; } else { off+=view.getUint16(off,false); }
+  } return 1;
+}
+async function appendThumb(listEl,itemId,photoId,meta){
+  const li=document.createElement('li'); li.className='thumb'; li.setAttribute('draggable','true'); li.dataset.photoId=photoId;
+  const blob=await DB.getPhoto(photoId); const url=blob?URL.createObjectURL(blob):'';
+  li.innerHTML=`
+    <img class="thumb__img" alt="Miniatura — ${meta.captions[photoId]||''}" src="${url}">
+    <div class="thumb__caption"><input type="text" placeholder="Legenda..." value="${meta.captions[photoId]||''}" aria-label="Legenda da foto"></div>
+    <div class="thumb__buttons">
+      <button class="icon-btn" data-act="view" aria-label="Ver foto">👁️</button>
+      <a class="icon-btn" data-act="dl" aria-label="Baixar foto" download="foto.jpg" href="${url}">⬇️</a>
+      <button class="icon-btn icon-btn--danger" data-act="remove" aria-label="Remover foto">🗑️</button>
+    </div>`;
+  let t; li.querySelector('input')?.addEventListener('input',(e)=>{ clearTimeout(t); t=setTimeout(()=>{ const m=ST.getItemMeta(itemId); m.captions[photoId]=e.target.value||''; ST.setItemMeta(itemId,m); },250); });
+  li.addEventListener('click',(e)=>{ const act=e.target?.dataset?.act; if(!act) return;
+    if(act==='view'){ const w=window.open('','_blank'); w?.document.write(`<img src="${url}" style="max-width:100%;height:auto;display:block;margin:0 auto"/>`); }
+    else if(act==='remove'){ confirm('Remover esta foto?') && removePhoto(itemId, photoId, li); }
+  });
+  li.addEventListener('dragstart',(e)=>{ e.dataTransfer.setData('text/plain', photoId); });
+  listEl.addEventListener('dragover',(e)=>{ e.preventDefault(); });
+  listEl.addEventListener('drop',(e)=>{ e.preventDefault(); const draggedId=e.dataTransfer.getData('text/plain'); const target=e.target.closest('.thumb'); if(!target||!draggedId)return; const targetId=target.dataset.photoId; reorder(itemId, draggedId, targetId); renderGalleryForItem(listEl.closest('.photo-item')); });
+  listEl.appendChild(li);
+}
+async function removePhoto(itemId,photoId,li){
+  await DB.deletePhoto(photoId);
+  const meta=ST.getItemMeta(itemId);
+  meta.photoIds=meta.photoIds.filter(id=>id!==photoId);
+  meta.order=meta.order.filter(id=>id!==photoId);
+  delete meta.captions[photoId];
+  ST.setItemMeta(itemId, meta);
+  li.remove();
+}
+function reorder(itemId,draggedId,targetId){
+  const meta=ST.getItemMeta(itemId); const arr=meta.order.slice(); const from=arr.indexOf(draggedId); const to=arr.indexOf(targetId);
+  if(from<0||to<0) return; arr.splice(from,1); arr.splice(to,0,draggedId); meta.order=arr; ST.setItemMeta(itemId, meta);
+}
+function toast(msg){ const el=document.createElement('div'); el.className='toast'; el.textContent=msg; document.body.appendChild(el); setTimeout(()=>{ el.remove(); },2200); }
+
+
+const PH = { restoreAllGalleries, renderGalleryForItem, installFileInputHandler, compressImage, toast };
+
+// === ui.js ===
+import * as ST from './state.js'; import * as PH from './photos.js';
+const qa=(s,r=document)=>Array.from(r.querySelectorAll(s)); const q=(s,r=document)=>r.querySelector(s);
+function toast(msg){ PH.toast(msg); }
+function assignStableItemIds(){
+  const seen=new Set();
+  qa('.photo-item').forEach((it, idx)=>{
+    let label = it.querySelector('.photo-title')?.textContent || '';
+    let id=''; const m = label.match(/FOTO\s*(\d+)/i);
+    if(m) id=`item-${String(m[1]).padStart(2,'0')}`; else id=`item-auto-${idx+1}`;
+    while(seen.has(id)) id=`${id}-x`; seen.add(id);
+    it.dataset.itemId=id;
+    // Ensure upload UI and handlers
+    PH.installFileInputHandler(it);
+  });
+  const total = qa('.photo-item').length;
+  const stat = q('#statItems'); if (stat) stat.textContent = String(total);
+}
+function installDelegatedHandlers(DB, ST, PH){
+  document.addEventListener('change',(e)=>{
+    const cb = e.target.closest('.photo-check__box, .photo-item input[type=checkbox]');
+    if (cb){
+      const item=e.target.closest('.photo-item');
+      if (item){ item.classList.toggle('photo-item--checked', e.target.checked); ST.persistChecksFromDOM(); refreshProgress(ST); }
+    }
+  });
+  document.addEventListener('input',(e)=>{ if (e.target.classList.contains('notes-area')){ ST.persistNotesFromDOM(); } });
+}
+function refreshProgress(STref){
+  const checks=STref.getChecks();
+  const cbs=qa('.photo-item input[type=checkbox]');
+  const total=cbs.length; const checked=cbs.filter(cb=>cb.checked).length;
+  const crit=cbs.filter(cb=>{ const title=cb.closest('.photo-item')?.querySelector('.photo-title')?.textContent||''; return title.includes('⭐'); });
+  const critChecked=crit.filter(cb=>cb.checked).length;
+  const perc = total ? Math.round(checked/total*100) : 0;
+  const fill=q('#progressFill'); if (fill){ fill.style.width=`${perc}%`; fill.textContent=`${perc}%`; }
+  const sp=q('#statPhotos'); if (sp) sp.textContent=String(checked);
+  const sc=q('#statCritical'); if (sc) sc.textContent=`${critChecked}/${crit.length}`;
+}
+function expandAll(){
+  qa('.section__header').forEach(btn=>{ const id=btn.getAttribute('aria-controls'); const panel=document.getElementById(id); if(panel){ btn.setAttribute('aria-expanded','true'); panel.hidden=false; const ch=q('.chevron', btn); if(ch) ch.style.transform='rotate(180deg)'; }});
+}
+function collapseAll(){
+  qa('.section__header').forEach(btn=>{ const id=btn.getAttribute('aria-controls'); const panel=document.getElementById(id); if(panel){ btn.setAttribute('aria-expanded','false'); panel.hidden=true; const ch=q('.chevron', btn); if(ch) ch.style.transform='rotate(0deg)'; }});
+}
+function installSectionToggles(){
+  qa('.section__header').forEach(btn=>{
+    btn.addEventListener('click',()=>{ const exp=btn.getAttribute('aria-expanded')==='true'; const id=btn.getAttribute('aria-controls'); const panel=document.getElementById(id); btn.setAttribute('aria-expanded', String(!exp)); if(panel) panel.hidden=exp; const ch=q('.chevron', btn); if(ch) ch.style.transform=exp?'rotate(0deg)':'rotate(180deg)'; });
+    btn.addEventListener('keydown',(e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); btn.click(); } });
+  });
+}
+
+const UI = { toast, assignStableItemIds, installDelegatedHandlers, refreshProgress, expandAll, collapseAll, installSectionToggles };
+
+// === bootstrap ===
+window.addEventListener('DOMContentLoaded', async () => {
+  UI.assignStableItemIds();
+  await ST.restoreAll(DB);
+  await PH.restoreAllGalleries(DB, ST);
+  UI.refreshProgress(ST);
+  document.getElementById('btnExpandAll').addEventListener('click', UI.expandAll);
+  document.getElementById('btnCollapseAll').addEventListener('click', UI.collapseAll);
+  document.getElementById('btnPrint').addEventListener('click', () => window.print());
+  document.getElementById('btnClear').addEventListener('click', async () => {
+    if (confirm('Limpar todos os dados (metadados + fotos)?')) { await DB.clearAll(); ST.clearAll(); location.reload(); }
+  });
+  document.getElementById('btnExport').addEventListener('click', async () => {
+    const data = await ST.exportJSON(DB);
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement('a'), { href:url, download:'pgrss-backup.json' });
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  });
+  document.getElementById('importInput').addEventListener('change', async (e) => {
+    const f = e.target.files?.[0]; if (!f) return;
+    const txt = await f.text(); const data = JSON.parse(txt);
+    await ST.importJSON(data); await PH.restoreAllGalleries(DB, ST);
+    UI.refreshProgress(ST); UI.toast('Backup importado com sucesso.');
+  });
+  UI.installDelegatedHandlers();
+  UI.installSectionToggles();
+});
+</script>
+
+</body>
+</html>
